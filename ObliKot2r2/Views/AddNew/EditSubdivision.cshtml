@@ -1,0 +1,74 @@
+﻿@model ObliKot2r2.Models.Subdivision
+
+@{
+    ViewData["Title"] = "Редагувати підрозділ";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> @ViewData["Title"]</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="EditSubdivision" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="IdSubdivision" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NameSubdivision" class="form-label">Назва підрозділу</label>
+                            <input asp-for="NameSubdivision" class="form-control" required />
+                            <span asp-validation-for="NameSubdivision" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="IdPhilia" class="form-label">Філія</label>
+                                <select asp-for="IdPhilia" asp-items="@(new SelectList(ViewBag.Philias, "IdPhilia", "NamePhilia"))"
+                                        class="form-select" required>
+                                    <option value="">-- Оберіть філію --</option>
+                                </select>
+                                <span asp-validation-for="IdPhilia" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdSubdivisionSAP" class="form-label">SAP ID</label>
+                                <input asp-for="IdSubdivisionSAP" class="form-control" />
+                                <span asp-validation-for="IdSubdivisionSAP" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                            <input asp-for="IdAnother" class="form-control" />
+                            <span asp-validation-for="IdAnother" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary me-md-2">
+                                <i class="bi bi-save"></i> Зберегти зміни
+                            </button>
+                            <a asp-action="Subdivision" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Скасувати
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

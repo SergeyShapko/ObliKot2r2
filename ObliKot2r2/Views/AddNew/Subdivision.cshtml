@@ -1,0 +1,286 @@
+﻿@model IEnumerable<ObliKot2r2.Models.Subdivision>
+@Html.AntiForgeryToken()
+@{
+    ViewData["Title"] = "Підрозділи філій";
+}
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+<style>
+    .hover-underline:hover {
+    text-decoration: underline !important;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="card shadow-sm">
+        
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-diagram-3 me-2"></i>
+                    <h4 class="mb-0 me-3">@ViewData["Title"]</h4>
+                    @if (ViewBag.FilteredPhilia != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark philia-badge">
+                                <i class="bi bi-filter-circle me-1"></i>
+                                Філія: @ViewBag.FilteredPhilia
+                            </span>
+                            <a asp-action="Subdivision" class="btn btn-sm btn-outline-light ms-2"
+                               title="Показати всі підрозділи">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <a asp-action="CreateSubdivision" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Додати
+                </a>
+            </div>
+        </div>
+
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <!-- Сортировка по названию подразделения -->
+                            <th>
+                                <a asp-action="Subdivision"
+                                   asp-route-philiaId="@Context.Request.Query["philiaId"]"
+                                   asp-route-sortOrder="@(ViewBag.NameSortParam == "name_asc" ? "name_desc" : "name_asc")"
+                                   asp-route-searchString="@Context.Request.Query["searchString"]"
+                                   class="text-decoration-none text-dark">
+                                    Назва
+                                    @if (ViewBag.NameSortParam == "name_desc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down-alt"></i>
+                                    }
+                                    else if (ViewBag.NameSortParam == "name_asc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-filter-left"></i>
+                                    }
+                                </a>
+                            </th>
+
+                            <!-- Сортировка по филиалу -->
+                            <th>
+                                <a asp-action="Subdivision"
+                                   asp-route-philiaId="@Context.Request.Query["philiaId"]"
+                                   asp-route-sortOrder="@(ViewBag.PhiliaSortParam == "philia_asc" ? "philia_desc" : "philia_asc")"
+                                   asp-route-searchString="@Context.Request.Query["searchString"]"
+                                   class="text-decoration-none text-dark">
+                                    Філія
+                                    @if (ViewBag.PhiliaSortParam == "philia_desc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down-alt"></i>
+                                    }
+                                    else if (ViewBag.PhiliaSortParam == "philia_asc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-filter-left"></i>
+                                    }
+                                </a>
+                            </th>
+
+                            <!-- Сортировка по SAP ID -->
+                            <th>
+                                <a asp-action="Subdivision"
+                                   asp-route-philiaId="@Context.Request.Query["philiaId"]"
+                                   asp-route-sortOrder="@(ViewBag.SapIdSortParam == "sapid_asc" ? "sapid_desc" : "sapid_asc")"
+                                   asp-route-searchString="@Context.Request.Query["searchString"]"
+                                   class="text-decoration-none text-dark">
+                                    SAP ID
+                                    @if (ViewBag.SapIdSortParam == "sapid_desc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down-alt"></i>
+                                    }
+                                    else if (ViewBag.SapIdSortParam == "sapid_asc")
+                                    {
+                                        <i class="bi bi-sort-alpha-down"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-filter-left"></i>
+                                    }
+                                </a>
+                            </th>
+
+                            <!-- Колонка действий без сортировки -->
+                            <th class="text-end">Дії</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="AddNew"
+                                       asp-action="Area"
+                                       asp-route-subdivisionId="@item.IdSubdivision"
+                                       class="text-primary text-decoration-none hover-underline">
+                                        @item.NameSubdivision
+                                        <i class="bi bi-arrow-right-short ms-1"></i>
+                                    </a>
+                                </td>
+                                <td>@item.Philia?.NamePhilia</td>
+                                <td>@item.IdSubdivisionSAP</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="EditSubdivision" asp-route-id="@item.IdSubdivision"
+                                           class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button class="btn btn-outline-danger"
+                                                onclick="confirmDeleteSubdivision(@item.IdSubdivision, this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            
+            </div>
+        </div>
+        
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a asp-controller="AddNew" asp-action="CreatePhilia" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> До філій
+                    </a>
+                </div>
+                <div class="text-muted small">
+                    Оновлено: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        @Model.Count() @PluralizeSubdivision(Model.Count())
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Функция для склонения слова "підрозділ"
+        function pluralizeSubdivision(count) {
+            if (count % 100 >= 11 && count % 100 <= 19) return 'підрозділів';
+            const lastDigit = count % 10;
+            if (lastDigit === 1) return 'підрозділ';
+            if (lastDigit >= 2 && lastDigit <= 4) return 'підрозділи';
+            return 'підрозділів';
+        }
+
+        // Подтверждение удаления
+        function confirmDeleteSubdivision(id, button) {
+            if (!confirm('Ви впевнені, що хочете видалити цей підрозділ?')) return;
+
+            const row = button.closest('tr');
+            row.style.opacity = '0.5';
+            button.disabled = true;
+
+            fetch(`/AddNew/DeleteSubdivision/${id}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    showToast('Підрозділ успішно видалено', 'success');
+                } else {
+                    showToast(data.message || 'Помилка при видаленні', 'error');
+                    row.style.opacity = '1';
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('Помилка при видаленні', 'error');
+                row.style.opacity = '1';
+                button.disabled = false;
+            });
+        }
+    </script>
+}
+
+@functions {
+    // Вспомогательная функция для склонения
+    string PluralizeSubdivision(int count)
+    {
+        if (count % 100 >= 11 && count % 100 <= 19) return "підрозділів";
+        switch (count % 10)
+        {
+            case 1: return "підрозділ";
+            case 2:
+            case 3:
+            case 4: return "підрозділи";
+            default: return "підрозділів";
+        }
+    }
+}

@@ -1,0 +1,47 @@
+﻿@model PointIO
+
+<form id="pointIOForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdPointIOSAP" />
+    <input type="hidden" asp-for="IdGMO" />
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Назва точки*</label>
+            <input asp-for="NamePointIO" class="form-control" required maxlength="200" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Тип точки*</label>
+            <select asp-for="IdTypePointIO" class="form-select" required>
+                <option value="">Оберіть тип...</option>
+                @foreach (var type in ViewBag.PointIOTypes)
+                {
+                    <option value="@type.IdTypePointIO">@type.NameTypePointIO</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">EIC-код</label>
+            <input asp-for="EIC" class="form-control" maxlength="16" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Дата початку*</label>
+            <input asp-for="DateBegin" type="date" class="form-control" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Дата завершення</label>
+            <input asp-for="DateEnd" type="date" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Зовнішній ID</label>
+            <input asp-for="IdAnother" class="form-control" maxlength="20" />
+        </div>
+    </div>
+</form>
+<div id="pointIOError" class="alert alert-danger" style="display: none;"></div>

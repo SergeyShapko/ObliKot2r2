@@ -1,0 +1,127 @@
+﻿@model ObliKot2r2.Models.Area
+
+@{
+    ViewData["Title"] = Model.IdArea == 0 ? "Додати промисловий майданчик" : "Редагувати майданчик";
+}
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi @(Model.IdArea == 0 ? "bi-plus-circle" : "bi-pencil-square")"></i>
+                        @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="@(Model.IdArea == 0 ? "CreateArea" : "EditArea")" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="IdArea" />
+
+                        <div class="mb-3">
+                            <label asp-for="NameArea" class="form-label">Назва майданчика*</label>
+                            <input asp-for="NameArea" class="form-control" required />
+                            <span asp-validation-for="NameArea" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="IdSubdivision" class="form-label">Підрозділ*</label>
+                                <select asp-for="IdSubdivision" asp-items="@(new SelectList(ViewBag.Subdivisions, "IdSubdivision", "FullName"))"
+                                        class="form-select" required>
+                                    <option value="">-- Оберіть підрозділ --</option>
+                                </select>
+                                <span asp-validation-for="IdSubdivision" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdAreaSAP" class="form-label">SAP ID</label>
+                                <input asp-for="IdAreaSAP" class="form-control" />
+                                <span asp-validation-for="IdAreaSAP" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                            <input asp-for="IdAnother" class="form-control" />
+                            <span asp-validation-for="IdAnother" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Area" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-arrow-left"></i> Скасувати
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Зберегти
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

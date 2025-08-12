@@ -1,0 +1,34 @@
+﻿@model ObliKot2r2.Models.Philia
+
+<div class="modal-header">
+    <h5 class="modal-title">Редагування філії</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <form asp-action="EditPhilia" method="post">
+        <input type="hidden" asp-for="IdPhilia" />
+
+        <div class="mb-3">
+            <label asp-for="NamePhilia" class="form-label">Назва філії</label>
+            <input asp-for="NamePhilia" class="form-control" />
+            <span asp-validation-for="NamePhilia" class="text-danger"></span>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label asp-for="IdPhiliaSAP" class="form-label">ID в SAP</label>
+                <input asp-for="IdPhiliaSAP" class="form-control" placeholder="Необязательно" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                <input asp-for="IdAnother" class="form-control" placeholder="Необязательно" />
+            </div>
+        </div>
+        <!-- Другие поля формы -->
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+            <button type="submit" class="btn btn-primary">Зберегти</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,33 @@
+﻿@using ObliKot2r2.Models;
+
+@model List<MeasuringPipe>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Ідентифікатор</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pipe in Model)
+        {
+            <tr data-pipe-id="@pipe.Id">
+                <td>@pipe.NameMPipe</td>
+                <td>@pipe.IdAnother</td>
+                <td>
+                    <button class="btn btn-sm btn-primary btn-edit" 
+                            data-id="@pipe.Id" 
+                            data-name="@pipe.NameMPipe" 
+                            data-idanother="@pipe.IdAnother">
+                        Редагувати
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-delete" data-id="@pipe.Id">
+                        Видалити
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

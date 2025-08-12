@@ -1,0 +1,33 @@
+﻿@model ObliKot2r2.Models.GasMeasuringObject
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="NameGMO" class="control-label">Назва ГМО</label>
+            <input asp-for="NameGMO" class="form-control" />
+            <span asp-validation-for="NameGMO" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Майданчик</label>
+            <select asp-for="IdArea" asp-items="@(new SelectList(ViewBag.Areas, "IdArea", "FullName"))"
+                    class="form-control">
+                <option value="">Оберіть майданчик...</option>
+            </select>
+            <span asp-validation-for="IdArea" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="IdGmoSAP" class="control-label">SAP ID</label>
+            <input asp-for="IdGmoSAP" class="form-control" />
+            <span asp-validation-for="IdGmoSAP" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IdAnother" class="control-label">Зовнішній ID</label>
+            <input asp-for="IdAnother" class="form-control" />
+        </div>
+    </div>
+</div>

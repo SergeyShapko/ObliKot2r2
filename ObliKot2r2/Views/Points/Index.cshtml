@@ -1,0 +1,63 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model IEnumerable<PointIO>
+@{
+    ViewData["Title"] = ViewBag.GMO != null ?
+        $"Точки входа/выхода - {ViewBag.GMO.NameGMO}" :
+        "Все точки входа/выхода";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4>@ViewData["Title"]</h4>
+            @if (ViewBag.GMO != null)
+            {
+                <a asp-action="Create" asp-route-gmoId="@ViewBag.GMO.IdGMO" class="btn btn-light">
+                    <i class="bi bi-plus-circle"></i> Добавить точку
+                </a>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>EIC-код</th>
+                    <th>Дата начала</th>
+                    <th>Дата окончания</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NamePointIO</td>
+                        <td>@item.PointIOType?.NameTypePointIO</td>
+                        <td>@item.EIC</td>
+                        <td>@item.DateBegin.ToString("dd.MM.yyyy")</td>
+                        <td>@(item.DateEnd?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.IdPointIOSAP" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.IdPointIOSAP" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Удалить точку?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

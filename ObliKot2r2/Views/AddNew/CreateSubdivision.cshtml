@@ -1,0 +1,139 @@
+﻿@model ObliKot2r2.Models.Subdivision
+
+@{
+    ViewData["Title"] = "Додати підрозділ";
+}
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> @ViewData["Title"]</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateSubdivision" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NameSubdivision" class="form-label">Назва підрозділу</label>
+                            <input asp-for="NameSubdivision" class="form-control" required />
+                            <span asp-validation-for="NameSubdivision" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="IdPhilia" class="form-label">Філія</label>
+                                <select asp-for="IdPhilia" asp-items="@(new SelectList(ViewBag.Philias, "IdPhilia", "NamePhilia"))"
+                                        class="form-select" required>
+                                    <option value="">-- Оберіть філію --</option>
+                                </select>
+                                <span asp-validation-for="IdPhilia" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdSubdivisionSAP" class="form-label">SAP ID</label>
+                                <input asp-for="IdSubdivisionSAP" class="form-control" />
+                                <span asp-validation-for="IdSubdivisionSAP" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                            <input asp-for="IdAnother" class="form-control" />
+                            <span asp-validation-for="IdAnother" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            
+                            <a asp-action="Subdivision" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-list-ul"></i> Всі підрозділи
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Зберегти
+                            </button>
+                            
+                           @*  <button type="submit" class="btn btn-primary me-md-2">
+                                <i class="bi bi-save"></i> Зберегти
+                            </button> *@
+                            <a asp-action="Subdivision" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> До списку
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Валидация формы
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+}

@@ -1,0 +1,398 @@
+﻿@model ObliKot2r2.Models.Philia
+@Html.AntiForgeryToken()
+@{
+    ViewData["Title"] = "Управление филиалами";
+}
+
+<div class="container-fluid">
+    <div class="row g-4">
+        <!-- Левая колонка - Форма добавления (40%) -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Додати нову філію</h4>
+                </div>
+                <div class="card-body">
+
+                    <form asp-action="CreatePhilia">
+
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show">
+                                @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="NamePhilia" class="form-label">Назва філії</label>
+                            <input asp-for="NamePhilia" class="form-control" placeholder="Введите название" />
+                            <span asp-validation-for="NamePhilia" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label asp-for="IdPhiliaSAP" class="form-label">ID в SAP</label>
+                                <input asp-for="IdPhiliaSAP" class="form-control" placeholder="Необязательно" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                                <input asp-for="IdAnother" class="form-control" placeholder="Необязательно" />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Зберегти
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-counterclockwise"></i> Скинути
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка - Таблица записей (60%) -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="bi bi-list-ul"></i> Існуючі філії</h4>
+                        <span class="badge bg-light text-dark records-counter"
+                              data-count="@ViewBag.PhilasCount">
+                            @ViewBag.PhilasCount записів <!-- начальное значение -->
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th>Назва</th>
+                                    <th>SAP ID</th>
+                                    <th class="text-end pe-4">Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.ExistingPhilas)
+                                {
+                                    <tr>
+                                        <td class="ps-4">@item.IdPhilia</td>
+                                        @* <td>@item.NamePhilia</td> *@
+
+                                        <td>
+                                            <a asp-controller="AddNew" asp-action="Subdivision" asp-route-philiaId="@item.IdPhilia"
+                                               class="text-primary text-decoration-none hover-underline"
+                                               title="Перейти до підрозділів цієї філії">
+                                                @item.NamePhilia
+                                                <i class="bi bi-arrow-right-short ms-1"></i>
+                                            </a>
+                                        </td>
+
+                                        <td>@item.IdPhiliaSAP</td>
+                                        <td class="text-end pe-4">
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary btn-sm"
+                                                        data-id="@item.IdPhilia"
+                                                        onclick="loadEditForm(@item.IdPhilia)">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                        data-id="@item.IdPhilia"
+                                                        onclick="confirmDelete(@item.IdPhilia, this)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+
+                                                </div>
+                                           
+                                        </td>
+                                       
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between">
+                        <div class="small text-muted">
+                            Останнє оновлення: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")
+                        </div>
+                        <div>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download"></i> Експорт
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+<style>
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+
+    .philia-badge {
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Инициализация счетчика
+        function initRecordsCounter() {
+            const counter = document.querySelector('.records-counter');
+            if (!counter) return;
+
+            const count = parseInt(counter.dataset.count);
+            counter.textContent = `${count} ${pluralizeRecords(count)}`;
+        }
+
+        // Обновление счетчика (можно вызывать после AJAX-запросов)
+        function updateRecordsCounter(newCount) {
+            const counter = document.querySelector('.records-counter');
+            if (!counter) return;
+
+            counter.dataset.count = newCount;
+            counter.textContent = `${newCount} ${pluralizeRecords(newCount)}`;
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initRecordsCounter();
+
+            // Ваш существующий код...
+            function updateTime() {
+                const now = new Date();
+                const options = {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                document.querySelector('.card-footer .text-muted').textContent =
+                    'Останнє оновлення: ' + now.toLocaleString('uk-UA', options);
+            }
+
+            updateTime();
+            setInterval(updateTime, 60000);
+
+            // Подтверждение удаления
+            document.querySelectorAll('.btn-outline-danger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (!confirm('Ви впевнені, що хочете видалити філіал?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+
+        // Обработка модальной формы
+        $(document).on('submit', '#universalModal form', function(e) {
+            e.preventDefault();
+
+            const form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        $('#universalModal').modal('hide');
+
+                        // Обновляем счетчик если есть новое количество
+                        if (response.newCount !== undefined) {
+                            updateRecordsCounter(response.newCount);
+                        }
+
+                        // Показываем уведомление
+                        Toastify({
+                            text: "Зміни успішно збережено!",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#28a745",
+                        }).showToast();
+
+                        // Обновляем таблицу через 500мс (можно заменить на точечное обновление)
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        $('#modalContent').html(response);
+                        $.validator.unobtrusive.parse(form);
+                    }
+                },
+                error: function() {
+                    Toastify({
+                        text: "Помилка при збереженні даних!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545",
+                    }).showToast();
+                }
+            });
+        });
+    
+         // Функция загрузки формы редактирования
+            function loadEditForm(id) {
+                fetch(`/AddNew/EditPhilia/${id}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.text();
+                    })
+                    .then(html => {
+                        const modalContent = document.getElementById('modalContent');
+                        modalContent.innerHTML = html;
+
+                        // Инициализация валидации
+                        $.validator.unobtrusive.parse(modalContent);
+
+                        // Показать модальное окно
+                        const modal = new bootstrap.Modal(document.getElementById('universalModal'));
+                        modal.show();
+                    })
+                    .catch(error => {
+                        console.error('Error loading edit form:', error);
+                        alert('Произошла ошибка при загрузке формы редактирования');
+                    });
+            }
+
+
+            // Глобальные переменные для удаления
+        let currentDeleteId = null;
+        let currentDeleteButton = null;
+
+        // Подтверждение удаления
+        function confirmDelete(id, button) {
+            currentDeleteId = id;
+            currentDeleteButton = button;
+
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        // Обработчик кнопки подтверждения удаления
+        document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+            if (!currentDeleteId) return;
+
+            const row = currentDeleteButton.closest('tr');
+            row.style.opacity = '0.5';
+            currentDeleteButton.disabled = true;
+
+            $.ajax({
+                url: `/AddNew/DeletePhilia/${currentDeleteId}`,
+                type: 'POST',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Удаляем строку из таблицы
+                        row.remove();
+
+                        // Обновляем счетчик
+                        updateRecordsCounter(response.newCount);
+
+                        // Показываем уведомление
+                        showToast('Успішно видалено!', 'success');
+                    } else {
+                        showToast(response.message, 'error');
+                        row.style.opacity = '1';
+                        currentDeleteButton.disabled = false;
+                    }
+                },
+                error: function() {
+                    showToast('Помилка при видаленні', 'error');
+                    row.style.opacity = '1';
+                    currentDeleteButton.disabled = false;
+                }
+            });
+
+            // Закрываем модальное окно
+            bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+        });
+
+        // Функция для показа уведомлений
+        function showToast(message, type = 'success') {
+            const bgColor = type === 'success' ? '#28a745' : '#dc3545';
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: bgColor,
+            }).showToast();
+        }
+
+ </script>
+}

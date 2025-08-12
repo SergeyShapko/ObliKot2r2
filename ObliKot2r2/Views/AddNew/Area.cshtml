@@ -1,0 +1,217 @@
+﻿@model IEnumerable<ObliKot2r2.Models.Area>
+@Html.AntiForgeryToken()
+@{
+    ViewData["Title"] = "Промислові майданчики";
+}
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+<style>
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+
+    .philia-badge {
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-building me-2"></i>
+                    <h4 class="mb-0 me-3">@ViewData["Title"]</h4>
+                    @if (ViewBag.FilteredSubdivision != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark philia-badge">
+                                <i class="bi bi-funnel me-1"></i>
+                                @ViewBag.FilteredSubdivision.Philia.NamePhilia → @ViewBag.FilteredSubdivision.NameSubdivision
+                            </span>
+                            <a asp-action="Area" class="btn btn-sm btn-outline-light ms-2">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+                <a asp-action="CreateArea" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Додати
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Назва</th>
+                            <th>Підрозділ</th>
+                            <th>Філія</th>
+                            <th>SAP ID</th>
+                            <th class="text-end">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="GMO"
+                                       asp-action="Index"
+                                       asp-route-areaId="@item.IdArea"
+                                       class="text-primary text-decoration-none hover-underline">
+                                        @item.NameArea
+                                        <i class="bi bi-arrow-right-short ms-1"></i>
+                                    </a>
+                                </td>
+                                <td>@item.Subdivision?.NameSubdivision</td>
+                                <td>@item.Subdivision?.Philia?.NamePhilia</td>
+                                <td>@item.IdAreaSAP</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="EditArea" asp-route-id="@item.IdArea"
+                                           class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button class="btn btn-outline-danger"
+                                                onclick="confirmDeleteArea(@item.IdArea, this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a asp-controller="AddNew" asp-action="Subdivision" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> До підрозділів
+                    </a>
+                </div>
+                <div class="text-muted small">
+                    Оновлено: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark">
+                        @Model.Count() @PluralizeArea(Model.Count())
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Функция для склонения слова "майданчик"
+        function pluralizeArea(count) {
+            if (count % 100 >= 11 && count % 100 <= 19) return 'майданчиків';
+            const lastDigit = count % 10;
+            if (lastDigit === 1) return 'майданчик';
+            if (lastDigit >= 2 && lastDigit <= 4) return 'майданчики';
+            return 'майданчиків';
+        }
+
+        // Подтверждение удаления
+        function confirmDeleteArea(id, button) {
+            if (!confirm('Ви впевнені, що хочете видалити цей майданчик?')) return;
+
+            const row = button.closest('tr');
+            row.style.opacity = '0.5';
+            button.disabled = true;
+
+            fetch(`/AddNew/DeleteArea/${id}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    showToast('Майданчик успішно видалено', 'success');
+                } else {
+                    showToast(data.message || 'Помилка при видаленні', 'error');
+                    row.style.opacity = '1';
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('Помилка при видаленні', 'error');
+                row.style.opacity = '1';
+                button.disabled = false;
+            });
+        }
+    </script>
+}
+
+@functions {
+    // Вспомогательная функция для склонения
+    string PluralizeArea(int count)
+    {
+        if (count % 100 >= 11 && count % 100 <= 19) return "майданчиків";
+        switch (count % 10)
+        {
+            case 1: return "майданчик";
+            case 2:
+            case 3:
+            case 4: return "майданчики";
+            default: return "майданчиків";
+        }
+    }
+}

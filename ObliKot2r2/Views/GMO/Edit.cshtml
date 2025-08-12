@@ -1,0 +1,108 @@
+﻿@model ObliKot2r2.Models.GasMeasuringObject
+@{
+    ViewData["Title"] = "Редагувати газовимірювальний об'єкт";
+}
+<style>
+    .card {
+        border-radius: 0.5rem;
+        border: none;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+</style>
+<style>
+    /* Анимации для плавности */
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Кастомный скролл для таблицы */
+    .table-responsive {
+        max-height: 65vh;
+        overflow-y: auto;
+    }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+</style>
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h4><i class="bi bi-pencil-square"></i> @ViewData["Title"]</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="IdGMO" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Основные поля -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="NameGMO" class="form-label">Назва об'єкту*</label>
+                    <input asp-for="NameGMO" class="form-control" />
+                    <span asp-validation-for="NameGMO" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="IdArea" class="form-label">Майданчик*</label>
+                    <select asp-for="IdArea" asp-items="@(new SelectList(ViewBag.Areas, "IdArea", "FullName"))"
+                            class="form-select">
+                    </select>
+                    <span asp-validation-for="IdArea" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Дополнительные идентификаторы -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="IdGmoSAP" class="form-label">SAP ID</label>
+                    <input asp-for="IdGmoSAP" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="IdAnother" class="form-label">Зовнішній ID</label>
+                    <input asp-for="IdAnother" class="form-control" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Скасувати
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Зберегти зміни
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

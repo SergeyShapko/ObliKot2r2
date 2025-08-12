@@ -1,0 +1,28 @@
+﻿@model ObliKot2r2.Models.Philia
+
+<div class="modal-header bg-danger text-white">
+    <h5 class="modal-title">Підтвердити видалення</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-action="DeletePhilia" method="post" id="deleteForm">
+    <input type="hidden" asp-for="IdPhilia" />
+
+    <div class="modal-body">
+        <p>Ви дійсно хочете видалити філіал <strong>@Model.NamePhilia</strong>?</p>
+
+        @if (!string.IsNullOrEmpty(Model.IdPhiliaSAP))
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Цей філіал має SAP ID: @Model.IdPhiliaSAP
+            </div>
+        }
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Відміна</button>
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Видалити
+        </button>
+    </div>
+</form>

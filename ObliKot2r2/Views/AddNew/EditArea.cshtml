@@ -1,0 +1,42 @@
+﻿@model ObliKot2r2.Models.Area
+@{
+    ViewData["Title"] = "Редактировать пром. площадку";
+}
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>@ViewData["Title"]</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditArea">
+            <input type="hidden" asp-for="IdArea" />
+
+            <div class="form-group mb-3">
+                <label asp-for="NameArea" class="control-label"></label>
+                <input asp-for="NameArea" class="form-control" />
+                <span asp-validation-for="NameArea" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="IdSubdivision" class="control-label"></label>
+                <select asp-for="IdSubdivision"
+                        asp-items="@(new SelectList(ViewBag.Subdivisions, "IdSubdivision", "NameSubdivision"))"
+                        class="form-control">
+                    <option value="">-- Выберите подразделение --</option>
+                </select>
+                <span asp-validation-for="IdSubdivision" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a asp-action="Area" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
